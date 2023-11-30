@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <SDL.h>
+#include "Canvas.h"
+
+class Canvas;
 
 class Renderer
 {
@@ -11,8 +14,12 @@ public:
 	void Shutdown();
 	bool CreateWindow(const std::string& title, int width, int height);
 
+	void PresentCanvas(const Canvas& canvas);
+
+	friend class Canvas;
+
 private:
 	SDL_Window* window = nullptr;
-	SDL_Renderer* renderer = nullptr;
+	SDL_Renderer* m_renderer = nullptr;
 };
 
