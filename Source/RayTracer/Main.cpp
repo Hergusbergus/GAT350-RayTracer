@@ -31,12 +31,17 @@ int main(int argc, char* argv[]) {
     auto metal = std::make_shared<Metal>(color3_t{ 1, 1, 1 }, 0.0f);
 
     // create objects -> add to scene
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 50; i++)
     {
         std::shared_ptr<Material> material = (rand() % 2) ? std::dynamic_pointer_cast<Material>(lambertian) : std::dynamic_pointer_cast<Material>(metal);
         auto sphere = std::make_unique<Sphere>(glm::vec3{ random(-5, 5), random(-5, 5), 15 }, random(0.2f, 1), material);
         scene.AddObject(std::move(sphere));
     }
+
+    // render scene 
+    canvas.Clear({ 0, 0, 0, 1 });
+    scene.Render(canvas, 50);
+    canvas.Update();
 
     bool quit = false;
     while (!quit)
@@ -51,10 +56,6 @@ int main(int argc, char* argv[]) {
             quit = true;
             break;
         }
-
-        canvas.Clear({ 0, 0, 0, 1 });
-        scene.Render(canvas);
-        canvas.Update();
 
         renderer.PresentCanvas(canvas);
     }

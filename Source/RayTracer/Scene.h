@@ -16,7 +16,7 @@ public:
 		m_bottomColor{ bottomColor }
 	{}
 
-	void Render(class Canvas& canvas);
+	void Render(class Canvas& canvas, int numSamples);
 
 	void SetCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
 

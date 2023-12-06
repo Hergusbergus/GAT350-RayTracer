@@ -2,8 +2,9 @@
 #include "Canvas.h"
 #include "MathUtils.h"
 #include "Ray.h"
+#include "Random.h"
 
-void Scene::Render(Canvas& canvas)
+void Scene::Render(class Canvas& canvas, int numSamples)
 {
 	// cast ray for each point (pixel) on the canvas
 	for (int y = 0; y < canvas.GetSize().y; y++)
@@ -11,21 +12,32 @@ void Scene::Render(Canvas& canvas)
 		for (int x = 0; x < canvas.GetSize().x; x++)
 		{
 			// create vec2 pixel from canvas x,y
-			glm::vec2 pixel(static_cast<float>(x), static_cast<float>(y));
-			// get normalized (0 - 1) point coordinates from pixel
-			glm::vec2 point = pixel / glm::vec2(canvas.GetSize());
-			// flip y
-			point.y = 1.0f - point.y;
+			glm::vec2 pixel = glm::vec2{ x, y };
 
-			// create ray from camera
-			ray_t ray = m_camera->GetRay(point);
+			// set initial color
+			color3_t color{ 0 };
+			// cast a ray for each sample, accumulate color value for each sample
+			// each ray will have a random offset
+			for (int sample = 0; sample < numSamples; sample++)
+			{
+				// get normalized (0 - 1) point coordinates from pixel
+				// add random x and y offset (0-1) to each pixel
+				glm::vec2 point = (pixel + glm::vec2{ random01(), random01() }) / glm::vec2(canvas.GetSize());
+				// flip y
+				point.y = 1.0f - point.y;
 
-			// cast ray into scene
-			// set color value from trace
-			raycastHit_t raycastHit;
-			color3_t color = Trace(ray, 0, 100, raycastHit, m_depth);
+				// create ray from camera
+				ray_t ray = m_camera->GetRay(point);
+
+				// cast ray into scene
+				// add color value from trace
+				raycastHit_t raycastHit;
+				color += Trace(ray, 0, 100, raycastHit, m_depth);
+			}
 
 			// draw color to canvas point (pixel)
+			// get average color (average = (color + color + color) / number of samples)
+			color /= static_cast<float>(numSamples);
 			canvas.DrawPoint(pixel, color4_t(color, 1));
 		}
 	}
