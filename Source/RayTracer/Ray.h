@@ -3,22 +3,22 @@
 
 struct ray_t
 {
-    glm::vec3 origin;
-    glm::vec3 direction;
-
     ray_t() = default;
     ray_t(const glm::vec3& origin, const glm::vec3& direction) :
-        origin(origin),
-        direction(glm::normalize(direction)) // Direction is normalized
+        m_origin(origin),
+        m_direction(direction)
     {
     }
 
-    glm::vec3 GetPoint(float distance) const { return origin + distance * direction; }
+    glm::vec3 GetPoint(float distance) const { return m_origin + distance * m_direction; }
 
     glm::vec3 At(float t) const
     {
-        return origin + t * direction;
+        return m_origin + t * m_direction;
     }
+
+    glm::vec3 m_origin;
+    glm::vec3 m_direction;
 };
 
 struct raycastHit_t

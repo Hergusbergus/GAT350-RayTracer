@@ -3,8 +3,9 @@
 #include "MathUtils.h"
 #include "Ray.h"
 #include "Random.h"
+#include <iomanip>
 
-void Scene::Render(class Canvas& canvas, int numSamples)
+void Scene::Render(Canvas& canvas, int numSamples, int depth)
 {
 	// cast ray for each point (pixel) on the canvas
 	for (int y = 0; y < canvas.GetSize().y; y++)
@@ -30,9 +31,9 @@ void Scene::Render(class Canvas& canvas, int numSamples)
 				ray_t ray = m_camera->GetRay(point);
 
 				// cast ray into scene
-				// add color value from trace
+				// set color value from trace
 				raycastHit_t raycastHit;
-				color += Trace(ray, 0, 100, raycastHit, m_depth);
+				color += Trace(ray, 0, 100, raycastHit, depth);
 			}
 
 			// draw color to canvas point (pixel)
@@ -40,6 +41,8 @@ void Scene::Render(class Canvas& canvas, int numSamples)
 			color /= static_cast<float>(numSamples);
 			canvas.DrawPoint(pixel, color4_t(color, 1));
 		}
+
+		std::cout << std::setprecision(2) << std::setw(5) << ((y / (float)canvas.GetSize().y) * 100) << "%\n";
 	}
 }
 
@@ -80,7 +83,7 @@ color3_t Scene::Trace(const ray_t& ray, float minDistance, float maxDistance, ra
 	}
 
 	// if ray not hit, return scene sky color
-	glm::vec3 direction = glm::normalize(ray.direction);
+	glm::vec3 direction = glm::normalize(ray.m_direction);
 	float t = (direction.y + 1) * 0.5f; // direction.y (-1 <-> 1) => (0 <-> 1)
 	color3_t color = lerp(m_bottomColor, m_topColor, t);
 

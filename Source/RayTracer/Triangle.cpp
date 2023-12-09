@@ -1,5 +1,6 @@
 #include "Triangle.h"
 #include "MathUtils.h"
+#include <glm/gtx/string_cast.hpp>
 
 bool Triangle::Hit(const ray_t& ray, float minDistance, float maxDistance, raycastHit_t& raycastHit)
 {
@@ -8,8 +9,8 @@ bool Triangle::Hit(const ray_t& ray, float minDistance, float maxDistance, rayca
     glm::vec3 edge2 = m_v3 - m_v1;
 
     // calculate triangle normal
-    glm::vec3 normal = cross(edge1, edge2);
-    glm::vec3 pvec = cross(ray.direction, edge2);
+    glm::vec3 normal = glm::normalize(cross(edge1, edge2));
+    glm::vec3 pvec = cross(ray.m_direction, edge2);
     float determinant = dot(pvec, edge1);
 
     // if determinant is less than 0 then ray is hitting back of triangle
@@ -21,7 +22,7 @@ bool Triangle::Hit(const ray_t& ray, float minDistance, float maxDistance, rayca
 
     float invDet = 1 / determinant;
 
-    glm::vec3 tvec = ray.origin - m_v1;
+    glm::vec3 tvec = ray.m_origin - m_v1;
     float u = dot(tvec, pvec) * invDet;
     if (u < 0 || u > 1)
     {
@@ -29,7 +30,7 @@ bool Triangle::Hit(const ray_t& ray, float minDistance, float maxDistance, rayca
     }
 
     glm::vec3 qvec = cross(tvec, edge1);
-    float v = dot(qvec, ray.direction) * invDet;
+    float v = dot(qvec, ray.m_direction) * invDet;
     if (v < 0 || u + v > 1)
     {
         return false;
